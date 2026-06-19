@@ -14,6 +14,9 @@ const path      = require('path');
 const app  = express();
 const PORT = process.env.PORT || 5000;
 
+// ─── Trust Proxy (for Railway) ────────────────────────────────────
+app.set('trust proxy', 1);
+
 // ─── CORS ────────────────────────────────────────────────────────
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
   .split(',').map(o => o.trim()).filter(Boolean);
@@ -39,9 +42,10 @@ app.use(express.static(path.join(__dirname)));
 app.use(rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 20,
-  standardHeaders: true,   // Return rate limit info in RateLimit-* headers
-  legacyHeaders: false,     // Disable X-RateLimit-* headers
+  standardHeaders: true,
+  legacyHeaders: false,
   message: { success: false, error: 'Too many requests. Try again in 15 minutes.' },
+  skip: (req) => req.method === 'GET' && !req.path.startsWith('/api/'),
 }));
 
 // ─── Logger ───────────────────────────────────────────────────────
