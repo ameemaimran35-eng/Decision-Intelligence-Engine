@@ -9,9 +9,12 @@ const express   = require('express');
 const cors      = require('cors');
 const axios     = require('axios');
 const rateLimit = require('express-rate-limit');
+const path      = require('path');
 
 const app  = express();
 const PORT = process.env.PORT || 5000;
+
+app.set('trust proxy', 1);
 
 // ─── CORS ────────────────────────────────────────────────────────
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
@@ -28,6 +31,9 @@ app.use(cors({
   allowedHeaders: ['Content-Type'],
 }));
 
+// ─── Static Files ─────────────────────────────────────────────────
+app.use(express.static(path.join(__dirname)));
+
 // ─── Middleware ───────────────────────────────────────────────────
 app.use(express.json({ limit: '10kb' }));
 
@@ -37,6 +43,7 @@ app.use(rateLimit({
   max: 20,
   standardHeaders: true,   // Return rate limit info in RateLimit-* headers
   legacyHeaders: false,     // Disable X-RateLimit-* headers
+  skip: (req) => req.method === 'GET' && !req.path.startsWith('/api/'),
   message: { success: false, error: 'Too many requests. Try again in 15 minutes.' },
 }));
 
@@ -375,7 +382,4 @@ app.listen(PORT, () => {
   console.log(`║   Model  : ${MODEL}          ║`);
   console.log(`║   Groq   : ✓ API key loaded                          ║`);
   console.log('╚══════════════════════════════════════════════════════╝\n');
-});
-app.get("/", (req, res) => {
-  res.json({ message: "API is running 🚀" });
 });
