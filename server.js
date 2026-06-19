@@ -376,3 +376,6 @@ app.listen(PORT, () => {
   console.log(`║   Groq   : ✓ API key loaded                          ║`);
   console.log('╚══════════════════════════════════════════════════════╝\n');
 });
+app.get("/", (req, res) => {
+  res.json({ message: "API is running 🚀" });
+});
