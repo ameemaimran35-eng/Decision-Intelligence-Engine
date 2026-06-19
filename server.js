@@ -9,6 +9,7 @@ const express   = require('express');
 const cors      = require('cors');
 const axios     = require('axios');
 const rateLimit = require('express-rate-limit');
+const path      = require('path');
 
 const app  = express();
 const PORT = process.env.PORT || 5000;
@@ -30,6 +31,9 @@ app.use(cors({
 
 // ─── Middleware ───────────────────────────────────────────────────
 app.use(express.json({ limit: '10kb' }));
+
+// ─── Static Files ─────────────────────────────────────────────────
+app.use(express.static(path.join(__dirname)));
 
 // ─── Rate Limiter ─────────────────────────────────────────────────
 app.use(rateLimit({
@@ -376,3 +380,4 @@ app.listen(PORT, () => {
   console.log(`║   Groq   : ✓ API key loaded                          ║`);
   console.log('╚══════════════════════════════════════════════════════╝\n');
 });
+
